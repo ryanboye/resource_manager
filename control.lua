@@ -1,41 +1,34 @@
 require "util"
 require "defines"
 
---The code for FreeER's Step By Step Guide to Modding Factorio (Created for Factorio 0.3.x Updated to 0.10.x) AKA Bomber Mod
-game.oninit(function()
-glob.bomber = 0
+i = 0
+
+script.on_init(function()
+    -- write_file('resources.txt', 'hello world')
 end)
 
-game.onevent(defines.events.ontick, function(event)
-  if game.player.character and game.player.character.vehicle and game.player.character.vehicle.name == "bomber" 
-and game.player.character.vehicle.getinventory(2).getitemcount("bomb") >= 1 and event.tick-glob.bomber >= 180 then
-    local bomb = game.findentities{{game.player.character.vehicle.position.x-5,game.player.character.vehicle.position.y-5},
-{game.player.character.vehicle.position.x+5,game.player.character.vehicle.position.y+5}}
-    local drop = false
-    local biters = 0
-    for k,v in pairs(bomb) do
-      if v.force.equals(game.forces.enemy) then
-        drop = true
-        if v.name == "small-biter" or v.name == "medium-biter" or v.name == "big-biter" then
-          biters = biters + 1
-          if biters < 5 then --if five or more will be killed then drop
-            drop = false
-          end
-        end
-      end
-    end
-    if drop then
-      glob.bomber = event.tick
-      for k,v in pairs(bomb) do
-        if v.force.equals(game.forces.enemy) then
-          if v.health then
-            v.die()
-          else
-            v.destroy()
-          end
-        end
-      end
-      game.player.character.vehicle.getinventory(2).remove{name="bomb", count=1}
+
+-- Print contents of `tbl`, with indentation.
+-- `indent` sets the initial level of indentation.
+function tprint (tbl, indent)
+  if not indent then indent = 0 end
+  for k, v in pairs(tbl) do
+    formatting = string.rep("  ", indent) .. k .. ": "
+    if type(v) == "table" then
+      print(formatting)
+      tprint(v, indent+1)
+    else
+      print(formatting .. v)
     end
   end
+end
+
+script.on_event(defines.events.on_tick, function(event)
+    i = i + 1
+    -- game.player.print(i)
+    if i % 200 == 0 then
+        for k,v in
+            pairs(game.player.get_inventory(1).get_contents()) do game.player.print(k .. v) 
+        end
+    end
 end)
